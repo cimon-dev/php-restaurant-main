@@ -26,6 +26,13 @@ CREATE TABLE ingredient (
     main_supplier VARCHAR(100)
 );
 
+-- Bảng loại nguyên liệu (category)
+CREATE TABLE IF NOT EXISTS ingredient_category (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    description TEXT
+);
+
 -- Danh mục món ăn
 CREATE TABLE menu_item (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -183,3 +190,4 @@ INSERT INTO restaurant_table (number, status) VALUES
 ('B08', 'free'),
 ('B09', 'free'),
 ('B10', 'free');
+ 

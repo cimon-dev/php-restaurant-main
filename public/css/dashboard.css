@@ -187,7 +187,7 @@
     min-height: 100vh;
 }
 
-.sidebar.collapsed ~ .main-content {
+.sidebar.collapsed~.main-content {
     margin-left: var(--sidebar-collapsed-width);
 }
 
@@ -366,8 +366,10 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.stats-card-header {
-    display: flex;
+.stats-card:focus {
+    outline: none;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+
     align-items: center;
     gap: 1rem;
     margin-bottom: 1rem;
