@@ -1,0 +1,10 @@
+RewriteEngine On
+# RewriteBase should match the folder name under your localhost. Update if you renamed the project folder.
+RewriteBase /php-restaurant-main/
+
+# Don't rewrite existing files or directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route all requests to index.php with `url` param
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
