@@ -13,8 +13,39 @@
         </div>
 
         <?php if ($flash): ?>
-            <div class="alert <?php echo $flash['type'] === 'success' ? 'alert-success' : 'alert-danger'; ?>">
+            <div class="alert alert-<?php echo $flash['type'] === 'success' ? 'success' : ($flash['type'] === 'warning' ? 'warning' : 'danger'); ?> alert-dismissible fade show" role="alert">
+                <i class="bi bi-<?php echo $flash['type'] === 'success' ? 'check-circle' : ($flash['type'] === 'warning' ? 'exclamation-triangle' : 'exclamation-circle'); ?>"></i>
                 <?php echo $flash['message']; ?>
+
+                <?php if ($flash['type'] === 'warning' && isset($_SESSION['inventory_warnings'])): ?>
+                    <hr>
+                    <div class="mt-2">
+                        <strong>Chi tiết nguyên liệu thiếu:</strong>
+                        <ul class="mb-0 mt-2">
+                            <?php foreach ($_SESSION['inventory_warnings'] as $warning): ?>
+                                <li>
+                                    <strong><?php echo htmlspecialchars($warning['menu_name']); ?></strong> (x<?php echo $warning['menu_qty']; ?>):
+                                    <ul>
+                                        <?php foreach ($warning['missing'] as $missing): ?>
+                                            <li>
+                                                <span class="text-danger">
+                                                    <?php echo htmlspecialchars($missing['ingredient_name']); ?> (<?php echo $missing['code']; ?>):
+                                                    Cần <?php echo number_format($missing['needed'], 2); ?>
+                                                    <?php echo htmlspecialchars($missing['unit']); ?>,
+                                                    còn <?php echo number_format($missing['available'], 2); ?>
+                                                    <?php echo htmlspecialchars($missing['unit']); ?>
+                                                </span>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                    <?php unset($_SESSION['inventory_warnings']); ?>
+                <?php endif; ?>
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
 
@@ -24,13 +55,30 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label>Bàn</label>
-                                <select name="table_id" class="form-control">
-                                    <option value="">-- Không chọn --</option>
-                                    <?php foreach ($tables as $t): ?>
-                                        <option value="<?php echo $t['id']; ?>"><?php echo htmlspecialchars($t['number']); ?></option>
+                                <label><i class="bi bi-table me-1"></i>Bàn (chỉ bàn trống)</label>
+                                <select name="table_id" class="form-control" required>
+                                    <option value="">-- Chọn bàn --</option>
+                                    <?php
+                                    $freeTables = array_filter($tables, function ($t) {
+                                        return $t['status'] === 'free';
+                                    });
+                                    foreach ($freeTables as $t):
+                                    ?>
+                                        <option value="<?php echo $t['id']; ?>">
+                                            <?php echo htmlspecialchars($t['number']); ?> - Trống
+                                        </option>
                                     <?php endforeach; ?>
+                                    <?php if (empty($freeTables)): ?>
+                                        <option value="" disabled>Không có bàn trống</option>
+                                    <?php endif; ?>
                                 </select>
+                                <small class="text-muted">Chỉ hiển thị những bàn đang trống</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label><i class="bi bi-people me-1"></i>Số lượng khách</label>
+                                <input type="number" name="guest_count" id="guest_count" class="form-control" min="1" value="1" required>
+                                <small class="text-muted">Dùng làm số lượng mặc định khi chọn món</small>
                             </div>
 
                             <div class="mb-3">
@@ -77,6 +125,28 @@
                                     const container = document.getElementById('order-items');
                                     const template = document.getElementById('order-row-template').content;
                                     const addBtn = document.getElementById('add-item');
+                                    const guestInput = document.getElementById('guest_count');
+                                    let guestCount = guestInput ? Math.max(parseInt(guestInput.value, 10) || 1, 1) : 1;
+
+                                    function syncEmptyRowQty() {
+                                        const rows = container.querySelectorAll('.order-row');
+                                        rows.forEach(r => {
+                                            const sel = r.querySelector('.menu-select');
+                                            const qtyInput = r.querySelector('.qty-input');
+                                            if (!sel.value) {
+                                                qtyInput.value = guestCount;
+                                            }
+                                        });
+                                    }
+
+                                    if (guestInput) {
+                                        guestInput.addEventListener('input', () => {
+                                            const val = Math.max(parseInt(guestInput.value, 10) || 1, 1);
+                                            guestCount = val;
+                                            guestInput.value = val;
+                                            syncEmptyRowQty();
+                                        });
+                                    }
 
                                     function buildOptions(select, selectedId) {
                                         select.innerHTML = '<option value="">-- Chọn món --</option>';
@@ -98,7 +168,7 @@
                                         });
                                     }
 
-                                    function addRow(selectedId = '', qty = 1) {
+                                    function addRow(selectedId = '', qty) {
                                         const node = document.importNode(template, true);
                                         const row = node.querySelector('.order-row');
                                         const select = row.querySelector('.menu-select');
@@ -106,7 +176,7 @@
                                         const removeBtn = row.querySelector('.remove-item');
 
                                         buildOptions(select, selectedId);
-                                        qtyInput.value = qty;
+                                        qtyInput.value = qty !== undefined && qty !== null ? qty : guestCount;
 
                                         removeBtn.addEventListener('click', () => {
                                             row.remove();
@@ -117,7 +187,7 @@
                                             const rows = container.querySelectorAll('.order-row');
                                             const last = rows[rows.length - 1];
                                             if (last === row && select.value) {
-                                                addRow('', 1);
+                                                addRow();
                                             }
                                             // refresh options to remove selected item from other selects
                                             refreshAllOptions();
@@ -127,9 +197,9 @@
                                     }
 
                                     // initialize with one empty row
-                                    addRow('', 1);
+                                    addRow();
 
-                                    addBtn.addEventListener('click', () => addRow('', 1));
+                                    addBtn.addEventListener('click', () => addRow());
 
                                     function refreshAllOptions() {
                                         const selects = container.querySelectorAll('.menu-select');

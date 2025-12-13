@@ -185,4 +185,58 @@ class InventoryIssueController extends Controller
         setFlash('success', 'Xóa phiếu xuất thành công');
         $this->redirect('inventory_issue');
     }
+
+    /**
+     * Complete issue and deduct from inventory (create inventory_log entries)
+     */
+    public function complete($id = null)
+    {
+        $user = JWT::getCurrentUser();
+        if (!$user) {
+            $this->redirect('auth/login');
+            return;
+        }
+
+        if (!$id) {
+            $this->redirect('inventory_issue');
+            return;
+        }
+
+        $db = getDB();
+
+        // Get issue
+        $issue = $this->model->find($id);
+        if (!$issue) {
+            setFlash('error', 'Phiếu không tồn tại');
+            $this->redirect('inventory_issue');
+            return;
+        }
+
+        // Get all details
+        $details = $this->model->getDetails($id);
+
+        // Create inventory_log entries for each item (negative for issue)
+        $stmtLog = $db->prepare('INSERT INTO inventory_log (ingredient_id, qty_change, type, related_id, note, created_by) VALUES (?, ?, ?, ?, ?, ?)');
+
+        $issueTypeMap = [
+            'sale' => 'issue',
+            'manual' => 'issue',
+            'waste' => 'expire'
+        ];
+        $logType = $issueTypeMap[$issue['issue_type']] ?? 'issue';
+
+        foreach ($details as $detail) {
+            $stmtLog->execute([
+                $detail['ingredient_id'],
+                -(int)$detail['qty'],  // qty_change (negative for issue)
+                $logType,              // type (issue or expire)
+                $id,                   // related_id (issue id)
+                'Xuất kho từ phiếu #' . $id . ' (' . $issue['issue_type'] . ')',
+                $user['id'] ?? null
+            ]);
+        }
+
+        setFlash('success', 'Hoàn thành phiếu xuất kho - Số lượng đã được cập nhật');
+        $this->redirect('inventory_issue');
+    }
 }

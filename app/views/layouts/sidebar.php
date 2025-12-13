@@ -42,14 +42,9 @@
                 <span>Công thức</span>
             </a>
 
-            <a href="<?php echo BASE_URL; ?>/inventory_receipt" class="menu-item <?php echo $first === 'inventory_receipt' ? 'active' : ''; ?>">
-                <i class="bi bi-box-arrow-in-right"></i>
-                <span>Nhập kho</span>
-            </a>
-
-            <a href="<?php echo BASE_URL; ?>/inventory_issue" class="menu-item <?php echo $first === 'inventory_issue' ? 'active' : ''; ?>">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Xuất kho</span>
+            <a href="<?php echo BASE_URL; ?>/report/stock_report" class="menu-item <?php echo ($first === 'report' && strpos($current, 'stock_report') !== false) ? 'active' : ''; ?>">
+                <i class="bi bi-graph-up"></i>
+                <span>Báo cáo kho</span>
             </a>
 
             <a href="<?php echo BASE_URL; ?>/restaurant_table" class="menu-item <?php echo $first === 'restaurant_table' ? 'active' : ''; ?>">
@@ -68,9 +63,9 @@
                 <span>Chi phí</span>
             </a>
 
-            <a href="<?php echo BASE_URL; ?>/report" class="menu-item <?php echo $first === 'report' ? 'active' : ''; ?>">
-                <i class="bi bi-graph-up"></i>
-                <span>Báo cáo</span>
+            <a href="<?php echo BASE_URL; ?>/report" class="menu-item <?php echo ($first === 'report' && strpos($current, 'stock_report') === false) ? 'active' : ''; ?>">
+                <i class="bi bi-bar-chart"></i>
+                <span>Báo cáo doanh thu</span>
             </a>
 
             <?php if ($currentUser && ($currentUser['role'] ?? '') === 'admin'): ?>

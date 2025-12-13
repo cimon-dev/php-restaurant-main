@@ -39,7 +39,44 @@ class InventoryReceiptController extends Controller
         }
 
         $ingredients = $this->ingredientModel->all('name', 'ASC');
-        $this->view('inventory_receipt/create', ['ingredients' => $ingredients]);
+
+        // Quick restock from stock_report
+        $quickIngredientId = isset($_GET['ingredient_id']) ? (int)$_GET['ingredient_id'] : null;
+        $quickQty = isset($_GET['qty']) ? (int)$_GET['qty'] : null;
+        $quickIngredient = null;
+        if ($quickIngredientId) {
+            $quickIngredient = $this->ingredientModel->find($quickIngredientId);
+        }
+
+        $this->view('inventory_receipt/create', [
+            'ingredients' => $ingredients,
+            'quickIngredient' => $quickIngredient,
+            'quickQty' => $quickQty
+        ]);
+    }
+
+    /**
+     * Create receipt from restock cart (multiple items)
+     */
+    public function create_from_restock()
+    {
+        $user = JWT::getCurrentUser();
+        if (!$user) {
+            $this->redirect('auth/login');
+            return;
+        }
+
+        $ingredients = $this->ingredientModel->all('name', 'ASC');
+
+        // Restock cart is in sessionStorage (client-side), we'll pass it to view
+        // View will pre-populate form from JavaScript/POST
+
+        $this->view('inventory_receipt/create', [
+            'ingredients' => $ingredients,
+            'fromRestock' => true,
+            'quickIngredient' => null,
+            'quickQty' => null
+        ]);
     }
 
     public function store()
@@ -63,6 +100,7 @@ class InventoryReceiptController extends Controller
             'created_by' => $user['id'] ?? null,
             'supplier' => $data['supplier'] ?? null,
             'receipt_date' => $data['receipt_date'],
+            'status' => 'pending',
             'note' => $data['note'] ?? null
         ];
 
@@ -187,6 +225,63 @@ class InventoryReceiptController extends Controller
 
         $this->model->delete($id);
         setFlash('success', 'Xóa phiếu nhập thành công');
+        $this->redirect('inventory_receipt');
+    }
+
+    /**
+     * Complete receipt and add to inventory (create inventory_log entries)
+     */
+    public function complete($id = null)
+    {
+        $user = JWT::getCurrentUser();
+        if (!$user) {
+            $this->redirect('auth/login');
+            return;
+        }
+
+        if (!$id) {
+            $this->redirect('inventory_receipt');
+            return;
+        }
+
+        $db = getDB();
+
+        // Get receipt
+        $receipt = $this->model->find($id);
+        if (!$receipt) {
+            setFlash('error', 'Phiếu không tồn tại');
+            $this->redirect('inventory_receipt');
+            return;
+        }
+
+        // If already completed, skip
+        if ($receipt['status'] === 'completed') {
+            setFlash('warning', 'Phiếu này đã hoàn thành rồi');
+            $this->redirect('inventory_receipt');
+            return;
+        }
+
+        // Get all details
+        $details = $this->model->getDetails($id);
+
+        // Create inventory_log entries for each item
+        $stmtLog = $db->prepare('INSERT INTO inventory_log (ingredient_id, qty_change, type, related_id, note, created_by) VALUES (?, ?, ?, ?, ?, ?)');
+
+        foreach ($details as $detail) {
+            $stmtLog->execute([
+                $detail['ingredient_id'],
+                (int)$detail['qty'],  // qty_change (positive for receipt)
+                'receipt',            // type
+                $id,                  // related_id (receipt id)
+                'Nhập kho từ phiếu #' . $id,
+                $user['id'] ?? null
+            ]);
+        }
+
+        // Update receipt status to completed
+        $this->model->update($id, ['status' => 'completed']);
+
+        setFlash('success', 'Hoàn thành phiếu nhập kho - Số lượng đã được cập nhật');
         $this->redirect('inventory_receipt');
     }
 }

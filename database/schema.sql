@@ -58,6 +58,7 @@ CREATE TABLE inventory_receipt (
     created_by INT,
     supplier VARCHAR(100),
     receipt_date DATE,
+    status ENUM('pending','completed') DEFAULT 'pending',
     note TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -78,6 +79,7 @@ CREATE TABLE inventory_issue (
     created_by INT,
     issue_type ENUM('sale','manual','waste') DEFAULT 'sale',
     issue_date DATE,
+    status ENUM('pending','completed') DEFAULT 'pending',
     note TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

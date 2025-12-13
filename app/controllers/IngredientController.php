@@ -26,7 +26,30 @@ class IngredientController extends Controller
             return;
         }
 
-        $items = $this->model->all('id', 'DESC');
+        $db = getDB();
+
+        // Get all ingredients with their current stock calculated from inventory_log
+        $sql = "
+            SELECT 
+                i.id,
+                i.code,
+                i.name,
+                i.category,
+                i.unit,
+                i.purchase_price,
+                i.min_stock,
+                i.main_supplier,
+                i.description,
+                COALESCE(SUM(il.qty_change), 0) as current_qty
+            FROM ingredient i
+            LEFT JOIN inventory_log il ON i.id = il.ingredient_id
+            GROUP BY i.id, i.code, i.name, i.category, i.unit, i.purchase_price, i.min_stock, i.main_supplier, i.description
+            ORDER BY i.id DESC
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        $items = $stmt->fetchAll();
+
         $this->view('ingredient/index', ['items' => $items, 'user' => $user]);
     }
 

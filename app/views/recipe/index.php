@@ -8,56 +8,74 @@
         <?php $flash = getFlash(); ?>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3>Công thức <?php echo isset($menu) ? 'cho: ' . htmlspecialchars($menu['name']) : ''; ?></h3>
+            <div>
+                <p class="text-muted mb-1">Công thức</p>
+                <h3 class="mb-0 fw-semibold">Công thức <?php echo isset($menu) ? 'cho: ' . htmlspecialchars($menu['name']) : ''; ?></h3>
+            </div>
             <?php if (!empty($menu_id)): ?>
-                <div>
-                    <a href="<?php echo BASE_URL; ?>/recipe/create?menu_id=<?php echo $menu_id; ?>" class="btn btn-primary">Tạo công thức mới</a>
-                    <a href="<?php echo BASE_URL; ?>/recipe" class="btn btn-secondary">Chọn món khác</a>
+                <div class="d-flex gap-2">
+                    <a href="<?php echo BASE_URL; ?>/recipe/create?menu_id=<?php echo $menu_id; ?>" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Tạo công thức mới
+                    </a>
+                    <a href="<?php echo BASE_URL; ?>/recipe" class="btn btn-outline-secondary">Chọn món khác</a>
                 </div>
             <?php else: ?>
-                <a href="<?php echo BASE_URL; ?>/recipe" class="btn btn-primary">Chọn món</a>
+                <a href="<?php echo BASE_URL; ?>/recipe" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Chọn món
+                </a>
             <?php endif; ?>
         </div>
 
         <?php if ($flash): ?>
-            <div class="alert <?php echo $flash['type'] === 'success' ? 'alert-success' : 'alert-danger'; ?>">
-                <?php echo $flash['message']; ?>
+            <div class="alert alert-<?php echo $flash['type'] === 'success' ? 'success' : ($flash['type'] === 'warning' ? 'warning' : 'danger'); ?> shadow-sm">
+                <i class="bi bi-info-circle me-1"></i><?php echo $flash['message']; ?>
             </div>
         <?php endif; ?>
 
-        <div class="card">
+        <div class="card shadow-sm">
             <div class="card-body p-0">
-                <table class="table table-striped mb-0">
-                    <thead>
-                        <tr>
-                            <th>Mã</th>
-                            <th>Món</th>
-                            <th>Nguyên liệu</th>
-                            <th>Số lượng</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($items)): ?>
-                            <?php foreach ($items as $it): ?>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mã</th>
+                                <th>Món</th>
+                                <th>Nguyên liệu</th>
+                                <th>Số lượng</th>
+                                <th class="text-end">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($items)): ?>
+                                <?php foreach ($items as $it): ?>
+                                    <tr>
+                                        <td class="fw-semibold text-primary"><?php echo $it['id']; ?></td>
+                                        <td><?php echo htmlspecialchars($it['menu_name'] ?? ''); ?></td>
+                                        <td><?php echo htmlspecialchars($it['ingredient_name'] ?? ''); ?></td>
+                                        <td class="fw-semibold"><?php echo $it['qty']; ?></td>
+                                        <td class="text-end">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="<?php echo BASE_URL; ?>/recipe/edit/<?php echo $it['id']; ?>" class="btn btn-outline-secondary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="<?php echo BASE_URL; ?>/recipe/delete/<?php echo $it['id']; ?>" class="btn btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
                                 <tr>
-                                    <td><?php echo $it['id']; ?></td>
-                                    <td><?php echo htmlspecialchars($it['menu_name'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($it['ingredient_name'] ?? ''); ?></td>
-                                    <td><?php echo $it['qty']; ?></td>
-                                    <td>
-                                        <a href="<?php echo BASE_URL; ?>/recipe/edit/<?php echo $it['id']; ?>" class="btn btn-sm btn-outline-secondary">Chỉnh sửa</a>
-                                        <a href="<?php echo BASE_URL; ?>/recipe/delete/<?php echo $it['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                        <div class="mt-2">Không tìm thấy công thức.</div>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center py-4">Không tìm thấy công thức.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

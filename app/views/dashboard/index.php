@@ -18,75 +18,89 @@
         <!-- Stats Cards -->
         <div class="row g-4 mb-4">
             <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon bg-gradient-primary">
-                        <i class="bi bi-box-seam"></i>
+                <a href="<?php echo BASE_URL; ?>/ingredient" class="text-decoration-none text-dark">
+                    <div class="stats-card hoverable">
+                        <div class="stats-icon bg-gradient-primary">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h3><?php echo htmlspecialchars($counts['ingredients'] ?? 0); ?></h3>
+                        <p>Tổng nguyên liệu</p>
                     </div>
-                    <h3><?php echo htmlspecialchars($counts['ingredients'] ?? 0); ?></h3>
-                    <p>Tổng nguyên liệu</p>
-                </div>
+                </a>
             </div>
 
             <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon bg-gradient-success">
-                        <i class="bi bi-egg-fried"></i>
+                <a href="<?php echo BASE_URL; ?>/menu_item" class="text-decoration-none text-dark">
+                    <div class="stats-card hoverable">
+                        <div class="stats-icon bg-gradient-success">
+                            <i class="bi bi-egg-fried"></i>
+                        </div>
+                        <h3><?php echo htmlspecialchars($counts['menu_items'] ?? 0); ?></h3>
+                        <p>Món ăn</p>
                     </div>
-                    <h3><?php echo htmlspecialchars($counts['menu_items'] ?? 0); ?></h3>
-                    <p>Món ăn</p>
-                </div>
+                </a>
             </div>
 
             <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon bg-gradient-warning">
-                        <i class="bi bi-table"></i>
+                <a href="<?php echo BASE_URL; ?>/restaurant_table" class="text-decoration-none text-dark">
+                    <div class="stats-card hoverable">
+                        <div class="stats-icon bg-gradient-warning">
+                            <i class="bi bi-table"></i>
+                        </div>
+                        <h3><?php echo htmlspecialchars($counts['tables'] ?? 0); ?></h3>
+                        <p>Bàn ăn</p>
                     </div>
-                    <h3><?php echo htmlspecialchars($counts['tables'] ?? 0); ?></h3>
-                    <p>Bàn ăn</p>
-                </div>
+                </a>
             </div>
 
             <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon bg-gradient-info">
-                        <i class="bi bi-receipt"></i>
+                <a href="<?php echo BASE_URL; ?>/sale_order" class="text-decoration-none text-dark">
+                    <div class="stats-card hoverable">
+                        <div class="stats-icon bg-gradient-info">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+                        <h3><?php echo htmlspecialchars($todayOrders ?? 0); ?></h3>
+                        <p>Đơn hàng hôm nay</p>
                     </div>
-                    <h3><?php echo htmlspecialchars($todayOrders ?? 0); ?></h3>
-                    <p>Đơn hàng hôm nay</p>
-                </div>
+                </a>
             </div>
         </div>
 
         <div class="row g-4 mb-4">
             <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-icon bg-gradient-success">
-                        <i class="bi bi-cash-stack"></i>
+                <a href="<?php echo BASE_URL; ?>/report" class="text-decoration-none text-dark">
+                    <div class="stats-card hoverable">
+                        <div class="stats-icon bg-gradient-success">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <h3><?php echo number_format($todayRevenue, 2); ?></h3>
+                        <p>Doanh thu hôm nay</p>
                     </div>
-                    <h3><?php echo number_format($todayRevenue, 2); ?></h3>
-                    <p>Doanh thu hôm nay</p>
-                </div>
+                </a>
             </div>
 
             <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-icon bg-gradient-secondary">
-                        <i class="bi bi-box-arrow-in-right"></i>
+                <a href="<?php echo BASE_URL; ?>/inventory_receipt" class="text-decoration-none text-dark">
+                    <div class="stats-card hoverable">
+                        <div class="stats-icon bg-gradient-secondary">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                        </div>
+                        <h3><?php echo htmlspecialchars($counts['receipts'] ?? 0); ?></h3>
+                        <p>Phiếu nhập</p>
                     </div>
-                    <h3><?php echo htmlspecialchars($counts['receipts'] ?? 0); ?></h3>
-                    <p>Phiếu nhập</p>
-                </div>
+                </a>
             </div>
 
             <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-icon bg-gradient-danger">
-                        <i class="bi bi-box-arrow-right"></i>
+                <a href="<?php echo BASE_URL; ?>/inventory_issue" class="text-decoration-none text-dark">
+                    <div class="stats-card hoverable">
+                        <div class="stats-icon bg-gradient-danger">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </div>
+                        <h3><?php echo htmlspecialchars($counts['issues'] ?? 0); ?></h3>
+                        <p>Phiếu xuất</p>
                     </div>
-                    <h3><?php echo htmlspecialchars($counts['issues'] ?? 0); ?></h3>
-                    <p>Phiếu xuất</p>
-                </div>
+                </a>
             </div>
         </div>
 

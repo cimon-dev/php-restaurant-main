@@ -27,6 +27,7 @@
                             <th>Ngày</th>
                             <th>Nhà cung cấp</th>
                             <th>Người tạo</th>
+                            <th>Trạng thái</th>
                             <th>Ghi chú</th>
                             <th>Thao tác</th>
                         </tr>
@@ -35,20 +36,34 @@
                         <?php if (!empty($items)): ?>
                             <?php foreach ($items as $it): ?>
                                 <tr>
-                                    <td><?php echo $it['id']; ?></td>
+                                    <td><strong><?php echo $it['id']; ?></strong></td>
                                     <td><?php echo htmlspecialchars($it['receipt_date']); ?></td>
                                     <td><?php echo htmlspecialchars($it['supplier']); ?></td>
                                     <td><?php echo htmlspecialchars($it['creator'] ?? '-'); ?></td>
-                                    <td><?php echo htmlspecialchars($it['note']); ?></td>
                                     <td>
-                                        <a href="<?php echo BASE_URL; ?>/inventory_receipt/edit/<?php echo $it['id']; ?>" class="btn btn-sm btn-outline-secondary">Chỉnh sửa</a>
-                                        <a href="<?php echo BASE_URL; ?>/inventory_receipt/delete/<?php echo $it['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                                        <?php
+                                        if ($it['status'] === 'completed') {
+                                            echo '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Hoàn thành</span>';
+                                        } else {
+                                            echo '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass"></i> Chờ</span>';
+                                        }
+                                        ?>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($it['note'] ?? '-'); ?></td>
+                                    <td>
+                                        <a href="<?php echo BASE_URL; ?>/inventory_receipt/edit/<?php echo $it['id']; ?>" class="btn btn-sm btn-outline-secondary">Xem</a>
+                                        <?php if ($it['status'] !== 'completed'): ?>
+                                            <a href="<?php echo BASE_URL; ?>/inventory_receipt/complete/<?php echo $it['id']; ?>" class="btn btn-sm btn-success" onclick="return confirm('Hoàn thành phiếu nhập này?')">Hoàn thành</a>
+                                            <a href="<?php echo BASE_URL; ?>/inventory_receipt/delete/<?php echo $it['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                                        <?php else: ?>
+                                            <span class="text-muted small">Đã hoàn thành</span>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="text-center py-4">Không tìm thấy phiếu nhập.</td>
+                                <td colspan="7" class="text-center py-4">Không tìm thấy phiếu nhập.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
