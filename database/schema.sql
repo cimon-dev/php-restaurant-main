@@ -172,24 +172,4 @@ CREATE TABLE audit_log (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert dữ liệu mẫu
--- User mặc định (password: admin123)
--- Hash tạo bằng: password_hash('admin123', PASSWORD_DEFAULT)
-INSERT INTO users (username, password, fullname, role, active) VALUES
-('admin', '$2y$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'Administrator', 'admin', TRUE),
-('manager', '$2y$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'Manager', 'manager', TRUE),
-('user', '$2y$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'User', 'user', TRUE);
 
--- Bàn ăn mẫu
-INSERT INTO restaurant_table (number, status) VALUES
-('B01', 'free'),
-('B02', 'free'),
-('B03', 'free'),
-('B04', 'free'),
-('B05', 'free'),
-('B06', 'free'),
-('B07', 'free'),
-('B08', 'free'),
-('B09', 'free'),
-('B10', 'free');
- 
