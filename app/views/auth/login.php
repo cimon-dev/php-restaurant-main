@@ -358,11 +358,11 @@
                 <div class="info-box">
                     <p><strong>Tài khoản mặc định:</strong></p>
                     <p>
-                        <span class="badge badge-admin">Quản trị viên</span>
-                        <span class="badge badge-admin">Quản lý</span>
-                        <span class="badge badge-admin">Nhân viên</span>
+                        <span class="badge badge-admin">admin</span>
+                        <span class="badge badge-admin">manager</span>
+                        <span class="badge badge-admin">user</span>
                     </p>
-                    <p>Mật khẩu: <span class="badge badge-password">admin123</span></p>
+                    <p>Mật khẩu: <span class="badge badge-password">123456</span></p>
                 </div>
 
                 <div class="register-link">
