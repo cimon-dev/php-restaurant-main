@@ -1,49 +1,56 @@
 <?php
+
 /**
  * Base Model
  */
 
-class Model {
-    
+class Model
+{
+
     protected $db;
     protected $table;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         $this->db = getDB();
     }
-    
+
     /**
      * Get all records
      */
-    public function all($orderBy = 'id', $order = 'ASC') {
+    public function all($orderBy = 'id', $order = 'ASC')
+    {
         $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY {$orderBy} {$order}");
         return $stmt->fetchAll();
     }
-    
+
     /**
      * Find by ID
      */
-    public function find($id) {
+    public function find($id)
+    {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
-    
+
     /**
      * Find by field
      */
-    public function findBy($field, $value) {
+    public function findBy($field, $value)
+    {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE {$field} = ?");
         $stmt->execute([$value]);
         return $stmt->fetch();
     }
-    
+
     /**
      * Get where
      */
-    public function where($conditions = [], $orderBy = 'id', $order = 'ASC') {
+    public function where($conditions = [], $orderBy = 'id', $order = 'ASC')
+    {
         $sql = "SELECT * FROM {$this->table}";
-        
+
         if (!empty($conditions)) {
             $sql .= " WHERE ";
             $where = [];
@@ -52,63 +59,67 @@ class Model {
             }
             $sql .= implode(' AND ', $where);
         }
-        
+
         $sql .= " ORDER BY {$orderBy} {$order}";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute($conditions);
         return $stmt->fetchAll();
     }
-    
+
     /**
      * Insert
      */
-    public function insert($data) {
+    public function insert($data)
+    {
         $fields = array_keys($data);
         $values = array_values($data);
         $placeholders = array_fill(0, count($fields), '?');
-        
+
         $sql = "INSERT INTO {$this->table} (" . implode(',', $fields) . ") 
                 VALUES (" . implode(',', $placeholders) . ")";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute($values);
-        
+
         return $this->db->lastInsertId();
     }
-    
+
     /**
      * Update
      */
-    public function update($id, $data) {
+    public function update($id, $data)
+    {
         $fields = [];
         foreach (array_keys($data) as $field) {
             $fields[] = "$field = ?";
         }
-        
+
         $sql = "UPDATE {$this->table} SET " . implode(',', $fields) . " WHERE id = ?";
-        
+
         $values = array_values($data);
         $values[] = $id;
-        
+
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($values);
     }
-    
+
     /**
      * Delete
      */
-    public function delete($id) {
+    public function delete($id)
+    {
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = ?");
         return $stmt->execute([$id]);
     }
-    
+
     /**
      * Count
      */
-    public function count($conditions = []) {
+    public function count($conditions = [])
+    {
         $sql = "SELECT COUNT(*) as total FROM {$this->table}";
-        
+
         if (!empty($conditions)) {
             $sql .= " WHERE ";
             $where = [];
@@ -117,20 +128,64 @@ class Model {
             }
             $sql .= implode(' AND ', $where);
         }
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute($conditions);
         $result = $stmt->fetch();
-        
+
         return $result['total'];
     }
-    
+
     /**
      * Query custom SQL
      */
-    public function query($sql, $params = []) {
+    public function query($sql, $params = [])
+    {
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Paginate a base SELECT query.
+     * Provide full base query without LIMIT/OFFSET.
+     * Returns ['data'=>[], 'pagination'=>['page','per_page','total','pages']]
+     */
+    public function paginate($baseSql, $params = [], $page = 1, $perPage = 10)
+    {
+        $page = max(1, (int)$page);
+        $perPage = max(1, min(100, (int)$perPage));
+
+        // total count
+        $countSql = "SELECT COUNT(*) AS total FROM (" . $baseSql . ") AS t";
+        $stmtCount = $this->db->prepare($countSql);
+        $stmtCount->execute($params);
+        $total = (int)($stmtCount->fetch()['total'] ?? 0);
+
+        $pages = $perPage > 0 ? (int)ceil($total / $perPage) : 1;
+        $page = min($page, max(1, $pages));
+        $offset = ($page - 1) * $perPage;
+
+        // data with limit
+        $dataSql = $baseSql . " LIMIT :limit OFFSET :offset";
+        $stmtData = $this->db->prepare($dataSql);
+        // bind params first
+        foreach ($params as $idx => $val) {
+            $stmtData->bindValue(is_int($idx) ? $idx + 1 : ":$idx", $val);
+        }
+        // bind limit/offset explicitly as integers
+        $stmtData->bindValue(':limit', (int)$perPage, \PDO::PARAM_INT);
+        $stmtData->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
+        $stmtData->execute();
+
+        return [
+            'data' => $stmtData->fetchAll(),
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'pages' => $pages
+            ]
+        ];
     }
 }

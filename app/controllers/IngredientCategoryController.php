@@ -23,9 +23,18 @@ class IngredientCategoryController extends Controller
             $this->redirect('auth/login');
             return;
         }
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->all('name', 'ASC');
-        $this->view('ingredient_category/index', ['items' => $items, 'user' => $user]);
+        $baseSql = "SELECT * FROM ingredient_category ORDER BY name ASC";
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+
+        $this->view('ingredient_category/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/ingredient_category',
+            'user' => $user
+        ]);
     }
 
     public function create()

@@ -23,9 +23,18 @@ class ExpenseController extends Controller
             $this->redirect('auth/login');
             return;
         }
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->getAllWithCreator();
-        $this->view('expense/index', ['items' => $items, 'user' => $user]);
+        $baseSql = "SELECT e.*, u.fullname as creator FROM expense e LEFT JOIN users u ON e.created_by = u.id ORDER BY e.expense_date DESC, e.id DESC";
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+
+        $this->view('expense/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/expense',
+            'user' => $user
+        ]);
     }
 
     public function create()

@@ -24,9 +24,18 @@ class MenuItemController extends Controller
             $this->redirect('auth/login');
             return;
         }
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->all('id', 'DESC');
-        $this->view('menu_item/index', ['items' => $items, 'user' => $user]);
+        $baseSql = "SELECT * FROM menu_item ORDER BY id DESC";
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+
+        $this->view('menu_item/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/menu_item',
+            'user' => $user
+        ]);
     }
 
     public function create()

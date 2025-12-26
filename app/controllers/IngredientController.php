@@ -26,10 +26,11 @@ class IngredientController extends Controller
             return;
         }
 
-        $db = getDB();
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        // Get all ingredients with their current stock calculated from inventory_log
-        $sql = "
+        $db = getDB();
+        $baseSql = "
             SELECT 
                 i.id,
                 i.code,
@@ -46,11 +47,17 @@ class IngredientController extends Controller
             GROUP BY i.id, i.code, i.name, i.category, i.unit, i.purchase_price, i.min_stock, i.main_supplier, i.description
             ORDER BY i.id DESC
         ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-        $items = $stmt->fetchAll();
 
-        $this->view('ingredient/index', ['items' => $items, 'user' => $user]);
+        // Use Model::paginate via a temporary Model instance
+        $model = $this->model('Ingredient');
+        $result = $model->paginate($baseSql, [], $page, $per);
+
+        $this->view('ingredient/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/ingredient',
+            'user' => $user
+        ]);
     }
 
     // Show create form

@@ -180,6 +180,15 @@
                 </table>
             </div>
         </div>
+        <?php
+        if (isset($pagination)) {
+            $paginationVar = $pagination;
+            $baseUrlVar = $baseUrl ?? (BASE_URL . '/sale_order');
+            $pagination = $paginationVar;
+            $baseUrl = $baseUrlVar;
+            include __DIR__ . '/../layouts/pagination.php';
+        }
+        ?>
 
         <!-- Hướng dẫn trạng thái -->
         <div class="mt-4 p-3 bg-light rounded">

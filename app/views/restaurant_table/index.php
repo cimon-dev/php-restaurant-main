@@ -105,6 +105,15 @@
                 </table>
             </div>
         </div>
+        <?php
+        if (isset($pagination)) {
+            $paginationVar = $pagination;
+            $baseUrlVar = $baseUrl ?? (BASE_URL . '/restaurant_table');
+            $pagination = $paginationVar;
+            $baseUrl = $baseUrlVar;
+            include __DIR__ . '/../layouts/pagination.php';
+        }
+        ?>
 
         <!-- Trạng thái hướng dẫn -->
         <div class="mt-4 p-3 bg-light rounded">

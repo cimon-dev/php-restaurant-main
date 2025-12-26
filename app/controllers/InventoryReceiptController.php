@@ -25,9 +25,18 @@ class InventoryReceiptController extends Controller
             $this->redirect('auth/login');
             return;
         }
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->getAllWithCreator();
-        $this->view('inventory_receipt/index', ['items' => $items, 'user' => $user]);
+        $baseSql = "SELECT ir.*, u.fullname as creator FROM inventory_receipt ir LEFT JOIN users u ON ir.created_by = u.id ORDER BY ir.receipt_date DESC, ir.id DESC";
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+
+        $this->view('inventory_receipt/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/inventory_receipt',
+            'user' => $user
+        ]);
     }
 
     public function create()

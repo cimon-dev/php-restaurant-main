@@ -25,9 +25,18 @@ class InventoryIssueController extends Controller
             $this->redirect('auth/login');
             return;
         }
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->getAllWithCreator();
-        $this->view('inventory_issue/index', ['items' => $items, 'user' => $user]);
+        $baseSql = "SELECT ii.*, u.fullname as creator FROM inventory_issue ii LEFT JOIN users u ON ii.created_by = u.id ORDER BY ii.issue_date DESC, ii.id DESC";
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+
+        $this->view('inventory_issue/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/inventory_issue',
+            'user' => $user
+        ]);
     }
 
     public function create()

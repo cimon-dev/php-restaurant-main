@@ -29,9 +29,18 @@ class SaleOrderController extends Controller
             $this->redirect('auth/login');
             return;
         }
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->getAllWithTable();
-        $this->view('sale_order/index', ['items' => $items, 'user' => $user]);
+        $baseSql = "SELECT o.*, t.number AS table_number FROM sale_order o LEFT JOIN restaurant_table t ON o.table_id = t.id ORDER BY o.order_time DESC";
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+
+        $this->view('sale_order/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/sale_order',
+            'user' => $user
+        ]);
     }
 
     public function create()

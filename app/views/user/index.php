@@ -75,6 +75,16 @@
                         </tbody>
                     </table>
                 </div>
+                <?php
+                // Render pagination controls if available
+                if (isset($pagination)) {
+                    $paginationVar = $pagination; // local alias
+                    $baseUrlVar = $baseUrl ?? (BASE_URL . '/user');
+                    $pagination = $paginationVar;
+                    $baseUrl = $baseUrlVar;
+                    include __DIR__ . '/../layouts/pagination.php';
+                }
+                ?>
             </div>
         </div>
     </div>

@@ -382,8 +382,19 @@ include BASE_PATH . '/app/views/layouts/sidebar.php';
             </div>
         </div>
 
+        <?php
+        // Render pagination controls for stock tables (place above history section)
+        if (isset($pagination)) {
+            $paginationVar = $pagination;
+            $baseUrlVar = $baseUrl ?? (BASE_URL . '/report/stock_report');
+            $pagination = $paginationVar;
+            $baseUrl = $baseUrlVar;
+            include BASE_PATH . '/app/views/layouts/pagination.php';
+        }
+        ?>
+
         <!-- Lịch sử xuất kho gần đây -->
-        <div class="mt-5">
+        <div class="mt-4">
             <h5 class="mb-3" style="font-weight: 600;">
                 <i class="bi bi-clock-history"></i> Lịch sử xuất kho (10 ngày gần đây)
             </h5>
@@ -435,6 +446,15 @@ include BASE_PATH . '/app/views/layouts/sidebar.php';
                     </div>
                 <?php endif; ?>
             </div>
+            <?php
+            if (isset($pagination)) {
+                $paginationVar = $pagination;
+                $baseUrlVar = $baseUrl ?? (BASE_URL . '/report/stock_report');
+                $pagination = $paginationVar;
+                $baseUrl = $baseUrlVar;
+                include BASE_PATH . '/app/views/layouts/pagination.php';
+            }
+            ?>
         </div>
     </div>
 </div>

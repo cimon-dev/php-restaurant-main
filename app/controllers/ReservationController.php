@@ -25,9 +25,18 @@ class ReservationController extends Controller
             $this->redirect('auth/login');
             return;
         }
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->all('start_time', 'DESC');
-        $this->view('reservation/index', ['items' => $items, 'user' => $user]);
+        $baseSql = "SELECT * FROM reservation ORDER BY start_time DESC";
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+
+        $this->view('reservation/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/reservation',
+            'user' => $user
+        ]);
     }
 
     public function create()

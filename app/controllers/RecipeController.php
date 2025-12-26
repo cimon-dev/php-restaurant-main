@@ -34,28 +34,53 @@ class RecipeController extends Controller
         $menuModel = $this->model('MenuItem');
         if (!$menu_id) {
             $q = isset($_GET['q']) ? trim($_GET['q']) : '';
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
+
             if ($q !== '') {
-                $sql = "SELECT * FROM menu_item WHERE name LIKE ? ORDER BY name ASC";
-                $menuItems = $menuModel->query($sql, ['%' . $q . '%']);
+                $baseSql = "SELECT * FROM menu_item WHERE name LIKE :q ORDER BY name ASC";
+                $params = ['q' => '%' . $q . '%'];
             } else {
-                $menuItems = $menuModel->all('name', 'ASC');
+                $baseSql = "SELECT * FROM menu_item ORDER BY name ASC";
+                $params = [];
             }
-            $this->view('recipe/select_menu', ['menuItems' => $menuItems, 'user' => $user, 'q' => $q]);
+
+            $result = $menuModel->paginate($baseSql, $params, $page, $per);
+            $menuItems = $result['data'];
+            $this->view('recipe/select_menu', [
+                'menuItems' => $menuItems,
+                'user' => $user,
+                'q' => $q,
+                'pagination' => $result['pagination'],
+                'baseUrl' => BASE_URL . '/recipe' . ($q !== '' ? ('?q=' . urlencode($q)) : '')
+            ]);
             return;
         }
 
         // Menu selected: fetch recipes only for that menu
-        $sql = "SELECT r.*, m.name AS menu_name, i.name AS ingredient_name
-                FROM recipe r
-                LEFT JOIN menu_item m ON r.menu_id = m.id
-                LEFT JOIN ingredient i ON r.ingredient_id = i.id
-                WHERE r.menu_id = ?
-                ORDER BY r.id DESC";
+        // Pagination for recipe items of selected menu
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->query($sql, [$menu_id]);
+        $baseSql = "SELECT r.*, m.name AS menu_name, i.name AS ingredient_name
+            FROM recipe r
+            LEFT JOIN menu_item m ON r.menu_id = m.id
+            LEFT JOIN ingredient i ON r.ingredient_id = i.id
+            WHERE r.menu_id = " . intval($menu_id) . "
+            ORDER BY r.id DESC";
+
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+        $items = $result['data'];
         $menu = $menuModel->find($menu_id);
 
-        $this->view('recipe/index', ['items' => $items, 'user' => $user, 'menu' => $menu, 'menu_id' => $menu_id]);
+        $this->view('recipe/index', [
+            'items' => $items,
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/recipe?menu_id=' . intval($menu_id),
+            'user' => $user,
+            'menu' => $menu,
+            'menu_id' => $menu_id
+        ]);
     }
 
     public function create($menu_id = null)

@@ -30,9 +30,18 @@ class UserController extends Controller
     {
         $user = $this->requireAdmin();
         if (!$user) return;
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->all('id', 'DESC');
-        $this->view('user/index', ['items' => $items, 'user' => $user]);
+        $baseSql = "SELECT * FROM users ORDER BY id DESC";
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+
+        $this->view('user/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/user',
+            'user' => $user
+        ]);
     }
 
     public function create()

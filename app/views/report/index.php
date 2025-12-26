@@ -191,24 +191,40 @@
             </div>
 
             <div class="stat-card expense">
-                <i class="bi bi-cash-coin stat-icon"></i>
-                <div class="stat-label"><i class="bi bi-arrow-down-circle"></i> Tổng chi phí</div>
-                <div class="stat-value text-danger"><?php echo number_format($totals['expense'], 0, ',', '.'); ?>đ</div>
-                <small class="text-muted">Khác trừ</small>
+                <i class="bi bi-inbox-fill stat-icon"></i>
+                <div class="stat-label"><i class="bi bi-basket"></i> Chi phí nguyên liệu</div>
+                <div class="stat-value text-danger"><?php echo number_format($totals['ingredient_cost'], 0, ',', '.'); ?>đ</div>
+                <small class="text-muted">Từ đơn hàng</small>
+            </div>
+
+            <div class="stat-card profit">
+                <i class="bi bi-graph-up stat-icon"></i>
+                <div class="stat-label"><i class="bi bi-check-circle"></i> Lợi nhuận (trước cơ định)</div>
+                <div class="stat-value text-primary"><?php echo number_format($totals['revenue'] - $totals['ingredient_cost'], 0, ',', '.'); ?>đ</div>
+                <small class="text-muted">Doanh thu - Chi phí NL</small>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card expense">
+                <i class="bi bi-wrench stat-icon"></i>
+                <div class="stat-label"><i class="bi bi-wrench"></i> Chi phí cố định</div>
+                <div class="stat-value text-danger"><?php echo number_format($totals['fixed_expense'], 0, ',', '.'); ?>đ</div>
+                <small class="text-muted">Từ trang chi phí</small>
+            </div>
+
+            <div class="stat-card expense">
+                <i class="bi bi-calculator stat-icon"></i>
+                <div class="stat-label"><i class="bi bi-list"></i> Tổng chi phí</div>
+                <div class="stat-value text-danger"><?php echo number_format($totals['total_expense'], 0, ',', '.'); ?>đ</div>
+                <small class="text-muted">Cơ định + Nguyên liệu</small>
             </div>
 
             <div class="stat-card profit">
                 <i class="bi bi-graph-up-arrow stat-icon"></i>
-                <div class="stat-label"><i class="bi bi-check-circle"></i> Lợi nhuận</div>
+                <div class="stat-label"><i class="bi bi-check-circle"></i> Tổng báo cáo</div>
                 <div class="stat-value text-primary"><?php echo number_format($totals['net'], 0, ',', '.'); ?>đ</div>
-                <small class="text-muted">Doanh thu - Chi phí</small>
-            </div>
-
-            <div class="stat-card orders">
-                <i class="bi bi-receipt stat-icon"></i>
-                <div class="stat-label"><i class="bi bi-basket"></i> Đơn hàng</div>
-                <div class="stat-value text-warning"><?php echo number_format($totals['orders'], 0); ?></div>
-                <small class="text-muted">Tổng số đơn</small>
+                <small class="text-muted">Doanh thu - Tổng chi phí</small>
             </div>
         </div>
 
@@ -237,17 +253,20 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="width: 15%;">Ngày</th>
-                            <th style="width: 21%; text-align: right;">Doanh thu</th>
-                            <th style="width: 21%; text-align: right;">Chi phí</th>
-                            <th style="width: 21%; text-align: right;">Lợi nhuận</th>
-                            <th style="width: 22%; text-align: center;">Số đơn</th>
+                            <th style="width: 12%;">Ngày</th>
+                            <th style="width: 16%; text-align: right;">Doanh thu</th>
+                            <th style="width: 13%; text-align: right;">Chi phí cố định</th>
+                            <th style="width: 13%; text-align: right;">Chi phí NL</th>
+                            <th style="width: 13%; text-align: right;">Tổng chi phí</th>
+                            <th style="width: 16%; text-align: right;">Lợi nhuận</th>
+                            <th style="width: 17%; text-align: center;">Số đơn</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($period as $d):
                             $row = $map[$d];
-                            $net = $row['revenue'] - $row['expense'];
+                            $total_expense = $row['fixed_expense'] + $row['ingredient_cost'];
+                            $net = $row['revenue'] - $total_expense;
                         ?>
                             <tr>
                                 <td>
@@ -262,7 +281,13 @@
                                     <strong><?php echo number_format($row['revenue'], 0, ',', '.'); ?>đ</strong>
                                 </td>
                                 <td style="text-align: right;" class="text-danger">
-                                    <strong><?php echo number_format($row['expense'], 0, ',', '.'); ?>đ</strong>
+                                    <strong><?php echo number_format($row['fixed_expense'], 0, ',', '.'); ?>đ</strong>
+                                </td>
+                                <td style="text-align: right;" class="text-danger">
+                                    <strong><?php echo number_format($row['ingredient_cost'], 0, ',', '.'); ?>đ</strong>
+                                </td>
+                                <td style="text-align: right;" class="text-danger">
+                                    <strong><?php echo number_format($total_expense, 0, ',', '.'); ?>đ</strong>
                                 </td>
                                 <td style="text-align: right;" class="text-primary">
                                     <strong><?php echo number_format($net, 0, ',', '.'); ?>đ</strong>
@@ -282,7 +307,13 @@
                                 <strong><?php echo number_format($totals['revenue'], 0, ',', '.'); ?>đ</strong>
                             </td>
                             <td style="text-align: right;" class="text-danger">
-                                <strong><?php echo number_format($totals['expense'], 0, ',', '.'); ?>đ</strong>
+                                <strong><?php echo number_format($totals['fixed_expense'], 0, ',', '.'); ?>đ</strong>
+                            </td>
+                            <td style="text-align: right;" class="text-danger">
+                                <strong><?php echo number_format($totals['ingredient_cost'], 0, ',', '.'); ?>đ</strong>
+                            </td>
+                            <td style="text-align: right;" class="text-danger">
+                                <strong><?php echo number_format($totals['total_expense'], 0, ',', '.'); ?>đ</strong>
                             </td>
                             <td style="text-align: right;" class="text-primary">
                                 <strong><?php echo number_format($totals['net'], 0, ',', '.'); ?>đ</strong>
@@ -294,6 +325,15 @@
                     </tfoot>
                 </table>
             </div>
+            <?php
+            if (isset($pagination)) {
+                $paginationVar = $pagination;
+                $baseUrlVar = $baseUrl ?? (BASE_URL . '/report');
+                $pagination = $paginationVar;
+                $baseUrl = $baseUrlVar;
+                include __DIR__ . '/../layouts/pagination.php';
+            }
+            ?>
         </div>
     </div>
 </div>

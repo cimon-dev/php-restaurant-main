@@ -69,6 +69,15 @@
                         </tbody>
                     </table>
                 </div>
+                <?php
+                if (isset($pagination)) {
+                    $paginationVar = $pagination;
+                    $baseUrlVar = $baseUrl ?? (BASE_URL . '/menu_item');
+                    $pagination = $paginationVar;
+                    $baseUrl = $baseUrlVar;
+                    include __DIR__ . '/../layouts/pagination.php';
+                }
+                ?>
             </div>
         </div>
     </div>

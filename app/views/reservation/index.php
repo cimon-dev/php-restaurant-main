@@ -59,6 +59,15 @@
                 </table>
             </div>
         </div>
+        <?php
+        if (isset($pagination)) {
+            $paginationVar = $pagination;
+            $baseUrlVar = $baseUrl ?? (BASE_URL . '/reservation');
+            $pagination = $paginationVar;
+            $baseUrl = $baseUrlVar;
+            include __DIR__ . '/../layouts/pagination.php';
+        }
+        ?>
     </div>
 </div>
 

@@ -24,9 +24,18 @@ class RestaurantTableController extends Controller
             $this->redirect('auth/login');
             return;
         }
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
 
-        $items = $this->model->all('id', 'DESC');
-        $this->view('restaurant_table/index', ['items' => $items, 'user' => $user]);
+        $baseSql = "SELECT * FROM restaurant_table ORDER BY id DESC";
+        $result = $this->model->paginate($baseSql, [], $page, $per);
+
+        $this->view('restaurant_table/index', [
+            'items' => $result['data'],
+            'pagination' => $result['pagination'],
+            'baseUrl' => BASE_URL . '/restaurant_table',
+            'user' => $user
+        ]);
     }
 
     public function create()

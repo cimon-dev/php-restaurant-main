@@ -67,6 +67,15 @@
                 </div>
             </div>
         </div>
+        <?php
+        if (isset($pagination)) {
+            $paginationVar = $pagination;
+            $baseUrlVar = $baseUrl ?? (BASE_URL . '/ingredient_category');
+            $pagination = $paginationVar;
+            $baseUrl = $baseUrlVar;
+            include __DIR__ . '/../layouts/pagination.php';
+        }
+        ?>
     </div>
 </div>
 
