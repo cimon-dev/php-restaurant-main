@@ -14,4 +14,9 @@ class RestaurantTable extends Model
     {
         return $this->findBy('number', $number);
     }
+
+    public function findByToken($token)
+    {
+        return $this->findBy('order_token', $token);
+    }
 }

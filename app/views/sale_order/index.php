@@ -10,24 +10,21 @@
         display: inline-block;
     }
 
+    /* Consistent palette: open=orange, served=blue, paid=green, cancel=red */
     .status-open {
-        background-color: #e3f2fd;
-        color: #1976d2;
-    }
-
-    .status-serving {
         background-color: #fff3e0;
         color: #f57c00;
     }
 
     .status-completed {
-        background-color: #e8f5e9;
-        color: #388e3c;
+        /* served - waiting payment */
+        background-color: #e3f2fd;
+        color: #1976d2;
     }
 
     .status-paid {
-        background-color: #f3e5f5;
-        color: #7b1fa2;
+        background-color: #e8f5e9;
+        color: #2e7d32;
     }
 
     .status-cancel {

@@ -52,6 +52,11 @@
                 <span>Quản lý bàn</span>
             </a>
 
+            <a href="<?php echo BASE_URL; ?>/qr" class="menu-item <?php echo $first === 'qr' ? 'active' : ''; ?>">
+                <i class="bi bi-qr-code"></i>
+                <span>QR đặt món</span>
+            </a>
+
 
             <a href="<?php echo BASE_URL; ?>/sale_order" class="menu-item <?php echo $first === 'sale_order' ? 'active' : ''; ?>">
                 <i class="bi bi-receipt"></i>
