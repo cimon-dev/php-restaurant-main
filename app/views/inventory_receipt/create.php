@@ -413,6 +413,9 @@
             if (!hasItems) {
                 e.preventDefault();
                 alert('Vui lòng thêm ít nhất một nguyên liệu');
+            } else {
+                // Clear restock cart from sessionStorage before submitting
+                sessionStorage.removeItem('restockCart');
             }
         });
 
